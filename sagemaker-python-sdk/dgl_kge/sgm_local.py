@@ -44,7 +44,8 @@ rules = [Rule.sagemaker(
     ],
 )]
 
-debugger_hook_config = DebuggerHookConfig(s3_output_path="/opt/ml/smdebug/", container_local_output_path="/opt/ml/smdebug/")
+debugger_hook_config = DebuggerHookConfig(s3_output_path="/opt/ml/smdebug/",
+        container_local_output_path="/opt/ml/output/tensors")
 
 estimator = PyTorch(
                   entry_point='train.py',
@@ -59,7 +60,8 @@ estimator = PyTorch(
                   framework_version='1.3.1',
                   py_version='py3',
                   rules = rules,
-                  debugger_hook_config = debugger_hook_config
+                  #debugger_hook_config = debugger_hook_config
+                  debugger_hook_config = False,
 #                  output_path="/opt/ml/smdebug/"
                  )
 

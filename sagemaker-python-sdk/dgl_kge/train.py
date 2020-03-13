@@ -6,10 +6,12 @@ import os
 import logging
 import time
 
+
 os.environ['SMDEBUG_CONFIG_FILE_PATH'] = '/opt/ml/code/debughookconfig.json'
 
+
 backend = os.environ.get('DGLBACKEND')
-if backend and backend.lower() == 'mxnet':
+if backend.lower() == 'mxnet':
     import multiprocessing as mp
     from train_mxnet import load_model
     from train_mxnet import train
@@ -138,9 +140,7 @@ def run(args, logger):
     if args.neg_sample_size_test < 0:
         args.neg_sample_size_test = n_entities
 
-    print("Getting training dataset")
     train_data = TrainDataset(dataset, args, ranks=args.num_proc)
-    print("ok")
     if args.num_proc > 1:
         train_samplers = []
         for i in range(args.num_proc):
@@ -245,8 +245,6 @@ def run(args, logger):
         model.share_memory()
 
     # train
-    print("Start training")
-    logging.info("Starting training --")
     start = time.time()
     if args.num_proc > 1:
         procs = []
@@ -282,22 +280,19 @@ def run(args, logger):
 
 if __name__ == '__main__':
     args = ArgParser().parse_args()
-    logging.getLogger().setLevel(logging.INFO)
 
     # sagemaker related args
-    num_gpus = int(os.environ.get('SM_NUM_GPUS', 0))
+    num_gpus = int(os.environ['SM_NUM_GPUS'])
     if num_gpus == 0:
         args.gpu = -1
     else:
         # only use gpu0 now
         args.gpu = 0
-
+    
     # specify model save location
-    args.save_path = str(os.environ.get('SM_MODEL_DIR', '.'))
+    args.save_path = str(os.environ['SM_MODEL_DIR'])
     args.save_emb = os.path.join(args.save_path, 'emb')
-    print("train.py args: {}".format(args))
-    print('some more output')
-
-    #logger = get_logger(args)
-    logger = logging.getLogger()
+    print(args)
+ 
+    logger = get_logger(args)
     run(args, logger)
